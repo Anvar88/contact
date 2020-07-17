@@ -1,2 +1,2 @@
 1.composer install
-migrate and seed
+2.migrate and seed
