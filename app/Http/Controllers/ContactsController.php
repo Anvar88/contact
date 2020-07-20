@@ -4,47 +4,100 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Contacts;
+use App\Groups;
 use DB;
 class ContactsController extends Controller
 {
 
+
+
     public function index(){
         $id = Auth()->user()->id;
-        $check = DB::table('contacts')->where('user_id',$id)->first();
-        if(!$check){
-              $contacts = array();
-        }elseif($check){
-              $contacts = DB::table('contacts')
-            ->join('users', 'contacts.user_id', '=', 'users.id')
-            ->join('groups', 'contacts.id_group', '=', 'groups.id')
-            ->select('users.name', 'contacts.*', 'groups.groups_name')->where('contacts.user_id',$id)
-            ->get();
-        }
 
+        $groups = groups();
 
-        return view('index',['contacts' => $contacts]);
+        $contacts = Contacts::latest()->where('user_id',$id)->paginate(5);
+        return view('contacts.index',compact('contacts','groups'))
+
+            ->with('i', (request()->input('page', 1) - 1) * 5);
 
     }
+
+
+
+    public function create()
+    {
+        $groups = groups();
+        return view('contacts.create',compact('groups'));
+    }
+
 
     public function store(Request $request){
-         $id = Auth()->user()->id;
-         $result = Contacts::create(['name' => $request['name'], 'phone' => $request['phone'],'user_id'=>$id,'id_group' => $request['group']]);
-         $groups_name = DB::table('groups')->where('id',$request['group'])->first();
-         $data = ['id' => $result->id, 'name' => $request['name'], 'phone' => $request['phone'],'group' => $groups_name->groups_name];
-         //$data = array();
-         return $data;
+       $id = Auth()->user()->id;
+       $request->validate([
+
+            'name' => 'required',
+
+            'phone' => 'required',
+
+            'id_group' => 'required',
+
+        ]);
+        $request['user_id'] = $id;
+        Contacts::create($request->all());
+
+        return redirect()->route('contacts.index')
+            ->with('success','Контакт успешно добавлен.');
+
 
     }
-    public function show($id)
+
+
+    public function show(Contacts $contact)
     {
-        $contact = Contacts::find($id);
+        $groups = groups();
 
-        return view('show',['contact' => $contact]);
+         return view('contacts.show',compact('contact','groups'));
     }
+
+
+    public function edit(Contacts $contact)
+    {
+        $groups = groups();
+
+        return view('contacts.edit',compact('contact','groups'));
+    }
+
+
+    public function update(Request $request, Contacts $contact)
+    {
+        $request->validate([
+
+            'name' => 'required',
+
+            'phone' => 'required',
+
+            'id_group' => 'required',
+
+        ]);
+
+
+
+        $contact->update($request->all());
+
+            return redirect()->route('contacts.index')
+
+            ->with('success','Контакт успешно изменен');
+    }
+
+
     public function destroy ($id)
     {
         Contacts::find($id)->delete();
-        return $id;
+       
+        return redirect()->route('contacts.index')
+
+            ->with('success','Контакт успешно удален');
     }
 
 }

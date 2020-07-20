@@ -14,10 +14,9 @@
                         </div>
                     @endif
 
-                    <div class="links">
+                        <div class="links">
                          <a href="contacts"> Контакты </a>
-                    </div>
-
+                        </div>
                 </div>
             </div>
         </div>

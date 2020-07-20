@@ -19,5 +19,7 @@ Route::get('/', function(){
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
-Route::resource('/contacts', 'ContactsController',['only' => ['index', 'store', 'show', 'destroy']]);
+Route::get('home', 'HomeController@index')->name('home');
+Route::resource('contacts', 'ContactsController');
+Route::resource('search', 'SearchController');
+Route::resource('groups', 'GroupsController');
