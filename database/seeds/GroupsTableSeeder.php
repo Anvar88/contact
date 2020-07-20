@@ -17,10 +17,10 @@ class GroupsTableSeeder extends Seeder
             'groups_name'=>'Одноклассники'
         ]);
          DB::table('groups')->insert([
-            'groups_name'=>'Родные'
-        ]);
-         DB::table('groups')->insert([
             'groups_name'=>'Однокурсники'
+        ]);
+        DB::table('groups')->insert([
+            'groups_name'=>'Родные'
         ]);
     }
 }
